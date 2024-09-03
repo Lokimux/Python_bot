@@ -20,14 +20,21 @@ responses = {
 
 # Step 3: Preprocess the user's input.
 def preprocess_text(text):
-    """Preprocess the user input by converting it to lowercase and removing punctuation."""
+    """
+    Preprocess the user input by converting it to lowercase and removing punctuation.
+    This step ensures that the bot can match keywords regardless of case or punctuation.
+    """
     text = text.lower()  # Convert text to lowercase to make the bot case-insensitive
     text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation to focus on the words
     return text
 
 # Step 4: Define a function to match the user's input with the appropriate response.
 def get_response(user_input):
-    """Return an appropriate response based on the user's input."""
+    """
+    Return an appropriate response based on the user's input.
+    The function checks if any predefined keyword is present in the input.
+    If a match is found, it returns the corresponding response from the dictionary.
+    """
     user_input = preprocess_text(user_input)  # Preprocess the user's input for easier matching
 
     # Check if any keyword in the dictionary matches the user's input
@@ -38,13 +45,32 @@ def get_response(user_input):
     # If no keyword matches, provide a default response
     return "I'm sorry, I don't understand that. Can you ask something else about Python?"
 
-# Step 5: Define the bot's response to messages.
+# Step 5: Handle the /start command.
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    """
+    Handle the /start command.
+    When the user sends the /start command, this function will be triggered.
+    The bot will greet the user and provide a brief introduction.
+    """
+    welcome_message = (
+        "Hello! I'm your Python learning bot. 🤖\n"
+        "Ask me anything about Python, and I'll do my best to help!\n\n"
+        "For example, you can ask about `print`, `variables`, `loops`, `functions`, and more.\n"
+        "Let's start learning!"
+    )
+    bot.reply_to(message, welcome_message)  # Send the welcome message to the user
+
+# Step 6: Define the bot's response to general messages.
 @bot.message_handler(func=lambda message: True)  # This handler responds to all messages
 def send_response(message):
-    """Respond to the user's message with the appropriate Python concept explanation."""
+    """
+    Respond to the user's message with the appropriate Python concept explanation.
+    The bot processes the incoming message, checks for keywords, and replies with the relevant information.
+    """
     user_input = message.text  # Get the text input from the user
-    response = get_response(user_input)  # Get the chatbot's response
+    response = get_response(user_input)  # Get the chatbot's response based on the input
     bot.reply_to(message, response)  # Send the response back to the user on Telegram
 
-# Step 6: Start polling for messages.
+# Step 7: Start polling for messages.
 bot.polling()  # This starts the bot and keeps it running to listen for incoming messages
