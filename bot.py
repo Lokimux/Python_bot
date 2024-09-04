@@ -2,7 +2,10 @@ import telebot  # Import the Telebot library to interact with the Telegram API
 import re  # Import the regular expressions module for string manipulation
 
 # Step 1: Define the bot token from BotFather
-bot = telebot.TeleBot("7380129005:AAFBdIDNPuXzVqQEqR47tE8v1jIn7L8CDxE")
+try:
+    bot = telebot.TeleBot("7380129005:AAFBdIDNPuXzVqQEqR47tE8v1jIn7L8CDxE")
+except Exception as e:
+    print(f"Error initializing bot: {e}")
 
 # Step 2: Define a dictionary with responses for various Python concepts.
 responses = {
@@ -24,8 +27,11 @@ def preprocess_text(text):
     Preprocess the user input by converting it to lowercase and removing punctuation.
     This step ensures that the bot can match keywords regardless of case or punctuation.
     """
-    text = text.lower()  # Convert text to lowercase to make the bot case-insensitive
-    text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation to focus on the words
+    try:
+        text = text.lower()  # Convert text to lowercase to make the bot case-insensitive
+        text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation to focus on the words
+    except Exception as e:
+        print(f"Error processing text: {e}")
     return text
 
 # Step 4: Define a function to match the user's input with the appropriate response.
@@ -35,15 +41,19 @@ def get_response(user_input):
     The function checks if any predefined keyword is present in the input.
     If a match is found, it returns the corresponding response from the dictionary.
     """
-    user_input = preprocess_text(user_input)  # Preprocess the user's input for easier matching
+    try:
+        user_input = preprocess_text(user_input)  # Preprocess the user's input for easier matching
 
-    # Check if any keyword in the dictionary matches the user's input
-    for key in responses.keys():
-        if key in user_input:  # If a keyword is found in the input
-            return responses[key]  # Return the corresponding response
-    
-    # If no keyword matches, provide a default response
-    return "I'm sorry, I don't understand that. Can you ask something else about Python?"
+        # Check if any keyword in the dictionary matches the user's input
+        for key in responses.keys():
+            if key in user_input:  # If a keyword is found in the input
+                return responses[key]  # Return the corresponding response
+        
+        # If no keyword matches, provide a default response
+        return "I'm sorry, I don't understand that. Can you ask something else about Python?"
+    except Exception as e:
+        print(f"Error getting response: {e}")
+        return "An error occurred while processing your request. Please try again."
 
 # Step 5: Handle the /start command.
 @bot.message_handler(commands=['start'])
@@ -53,13 +63,16 @@ def send_welcome(message):
     When the user sends the /start command, this function will be triggered.
     The bot will greet the user and provide a brief introduction.
     """
-    welcome_message = (
-        "Hello! I'm your Python learning bot. 🤖\n"
-        "Ask me anything about Python, and I'll do my best to help!\n\n"
-        "For example, you can ask about `print`, `variables`, `loops`, `functions`, and more.\n"
-        "Let's start learning!"
-    )
-    bot.reply_to(message, welcome_message)  # Send the welcome message to the user
+    try:
+        welcome_message = (
+            "Hello! I'm your Python learning bot. 🤖\n"
+            "Ask me anything about Python, and I'll do my best to help!\n\n"
+            "For example, you can ask about `print`, `variables`, `loops`, `functions`, and more.\n"
+            "Let's start learning!"
+        )
+        bot.reply_to(message, welcome_message)  # Send the welcome message to the user
+    except Exception as e:
+        print(f"Error sending welcome message: {e}")
 
 # Step 6: Define the bot's response to general messages.
 @bot.message_handler(func=lambda message: True)  # This handler responds to all messages
@@ -68,9 +81,16 @@ def send_response(message):
     Respond to the user's message with the appropriate Python concept explanation.
     The bot processes the incoming message, checks for keywords, and replies with the relevant information.
     """
-    user_input = message.text  # Get the text input from the user
-    response = get_response(user_input)  # Get the chatbot's response based on the input
-    bot.reply_to(message, response)  # Send the response back to the user on Telegram
+    try:
+        user_input = message.text  # Get the text input from the user
+        response = get_response(user_input)  # Get the chatbot's response based on the input
+        bot.reply_to(message, response)  # Send the response back to the user on Telegram
+    except Exception as e:
+        print(f"Error sending response: {e}")
+        bot.reply_to(message, "An error occurred while processing your request. Please try again.")
 
 # Step 7: Start polling for messages.
-bot.polling()  # This starts the bot and keeps it running to listen for incoming messages
+try:
+    bot.polling()  # This starts the bot and keeps it running to listen for incoming messages
+except Exception as e:
+    print(f"Error with bot polling: {e}")
